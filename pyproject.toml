@@ -12,7 +12,8 @@ dependencies = [
     "fastapi (>=0.118.2,<0.119.0)",
     "uvicorn (>=0.37.0,<0.38.0)",
     "pymupdf (>=1.26.4,<2.0.0)",
-    "markdown (>=3.9,<4.0)"
+    "markdown (>=3.9,<4.0)",
+    "langchain-text-splitters (>=0.3.11,<0.4.0)"
 ]
 
 
