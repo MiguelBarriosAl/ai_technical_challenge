@@ -14,3 +14,5 @@ env/
 # Ignore IDE specific files
 .vscode/
 .idea/
+# Ignore qdrant database files
+qdrant_storage

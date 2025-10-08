@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     LITELLM_API_KEY: str | None = None
     QDRANT_URL: str = "http://localhost:6333"
-    ENVIRONMENT: str = "dev"
+    ENVIRONMENT: str
 
     class Config:
         env_file = ".env"
