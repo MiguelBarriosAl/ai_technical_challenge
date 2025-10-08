@@ -1,28 +1,23 @@
-[project]
+[tool.poetry]
 name = "travel-assistant"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Your Name",email = "you@example.com"}
-]
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "pydantic-settings (>=2.11.0,<3.0.0)",
-    "fastapi (>=0.118.2,<0.119.0)",
-    "uvicorn (>=0.37.0,<0.38.0)",
-    "pymupdf (>=1.26.4,<2.0.0)",
-    "markdown (>=3.9,<4.0)",
-    "langchain-text-splitters (>=0.3.11,<0.4.0)"
-]
 
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0.0"
+fastapi = "^0.118.2"
+uvicorn = "^0.37.0"
+pymupdf = "^1.26.4"
+markdown = "^3.9"
+langchain-text-splitters = "^0.3.11"
+langchain-openai = "^0.3.35"
+langchain-huggingface = "^0.3.1"
+langchain-community = "^0.3.31"
+sentence-transformers = "^5.1.1"
+pydantic-settings = "^2.11.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.group.dev.dependencies]
-black = "^25.9.0"
-ruff = "^0.14.0"
-pytest = "^8.4.2"
-pre-commit = "^4.3.0"
