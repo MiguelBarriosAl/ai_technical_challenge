@@ -1,49 +1,197 @@
-## Technical Challenge: LLM Airline Policy App
+# Travel Assistant - AI Technical Challenge
 
-### Overview
+A RAG (Retrieval-Augmented Generation) powered travel assistant application that helps users with travel-related queries using airline policies as a knowledge base. The system combines vector search capabilities with AI language models to provide accurate and contextual responses.
 
-Welcome the Flight Center AI Center Of Excellence technical challenge. We're excited about your interest in joining us using AI to revolutionize the travel industry.
+## Architecture
 
-The purpose of this challenge is to assess your skills in using Python and Large Language Models (LLMs).
+This project consists of:
 
-### Challenge Description
+- **Travel Assistant API**: A Streamlit-based web application that serves as the user interface
+- **Qdrant Vector Database**: Stores and retrieves policy documents using vector embeddings
+- **RAG System**: Combines retrieval and generation for intelligent responses
+- **Policy Documents**: Airline policies from American Airlines, Delta, and United
 
-Your task is to create a small application where a user can ask questions about the policy of an airline. The application should query the airline documents to retrieve relevant information based on the user questions. The application should leverage an LLM for understanding and answering questions and a vector database to store and retrieve document embeddings efficiently.
+## Prerequisites
 
-We've included a collection of airline policies. Your task is to create an application where users can ask questions and get answers for queries like the following:
+Before starting, ensure you have the following installed:
 
-1. `Can my pet travel with me on the plane on Delta?`
+- [Docker](https://www.docker.com/get-started) (version 20.10+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0+)
 
-2. `I have three kids 2, 8 and 10 years old and I am traveling with them on a United flight, what are the rules for children traveling?`
+## Environment Setup
 
-3. `What is the baggage policy for American Airlines?`
+### 1. Environment Configuration
 
-4. `My wife is 8 months pregnant, can she travel on a Delta flight?`
+Create a `.env` file in the project root directory. **This file is required** for the service to start properly.
 
-### Objectives
+```bash
+# Example .env file
+LITELLM_API_KEY=your_api_key_here
+QDRANT_URL=http://qdrant:6333
+ENVIRONMENT=dev
+```
 
-Build a chatbot application that can answer questions about airline policies. The application should have the following features:
+**Important**: Without the `.env` file, the containers will fail to start.
 
-1. **User Interface**: A simple web interface where users can input questions and get answers.
-2. **LLM Integration**: Use a pre-trained LLM model to understand and answer questions.
-3. **Document Processing**: Extract text from the airline policy documents.
-4. **Vector Database**: Store document embeddings in a vector database for efficient similarity search.
+### 2. Build and Run
 
-### Provided Policies
+Since there's no Makefile in the current setup, use Docker Compose directly:
 
-The airline policy documents are provided in PDF and markdown format. You will need to process these documents to extract the text before processing.
+```bash
+# Build and start all services
+docker compose up --build
 
-### Deliverables
+# Or run in detached mode
+docker compose up --build -d
+```
 
-- Code hosted on a private GitHub repository.
-  - Fork this repository to your GitHub account.
-  - Push your developed code to your fork.
-  - Email us the link to your private repository when you are ready for review.
-- A README file documenting:
-  - How to set up and run your application.
-  - A brief explanation of your design choices and technologies used.
-  - Any challenges you encountered and how you resolved them.
+This command will:
+- Build the application Docker image using the local Dockerfile
+- Start Qdrant vector database on port 6333
+- Start the Streamlit application on port 8501
+- Set up the necessary volume mounts and networking
 
-### LLM Model
+### 3. Access the Application
 
-You can use any pre-trained LLM model of your choice. We recommend using OpenAI's GPT models, an API Key will be provided to you.
+Once the containers are running, access the application at:
+
+**http://localhost:8501**
+
+## Stopping Services
+
+To stop and remove all containers:
+
+```bash
+docker compose down
+
+# To also remove volumes (will delete stored data)
+docker compose down -v
+```
+
+## Project Structure
+
+```
+ai_technical_challenge/
+├── travel_assistant/           # Main application package
+│   ├── app/                   # Streamlit web application
+│   ├── core/                  # Core configurations and settings
+│   ├── rag/                   # RAG (Retrieval-Augmented Generation) logic
+│   └── tests/                 # Unit tests
+├── policies/                  # Airline policy documents
+│   ├── AmericanAirlines/      # American Airlines policies
+│   ├── Delta/                 # Delta Airlines policies
+│   └── United/                # United Airlines policies
+├── qdrant_storage/            # Qdrant database storage (auto-generated)
+├── docker-compose.yml         # Multi-container Docker application
+├── Dockerfile                 # Application container definition
+├── pyproject.toml            # Poetry dependencies and project metadata
+└── .env                      # Environment variables (create this file)
+```
+
+### Key Files Description
+
+| File/Folder | Description |
+|-------------|-------------|
+| `Dockerfile` | Builds the application image with Python 3.11, Poetry, and Streamlit |
+| `docker-compose.yml` | Orchestrates the `qdrant` and `app` services with proper networking |
+| `.env` | Contains environment-specific settings (API keys, URLs, etc.) |
+| `pyproject.toml` | Poetry configuration with dependencies and development tools |
+| `policies/` | Knowledge base containing airline policy documents |
+
+## Code Quality and Best Practices
+
+This project maintains high code quality through automated tools:
+
+### **Black** - Code Formatter
+Automatically applies consistent formatting following PEP8 guidelines:
+```bash
+poetry run black .
+```
+
+### **Ruff** - Ultra-fast Linter
+Detects errors, bad practices, and unused imports:
+```bash
+# Check for issues
+poetry run ruff check .
+
+# Auto-fix issues
+poetry run ruff check --fix .
+```
+
+### **Pre-commit** - Git Hooks
+Ensures code quality before commits by running Black and Ruff automatically:
+```bash
+# Install pre-commit hooks
+poetry run pre-commit install
+
+# Manually run all hooks
+poetry run pre-commit run --all-files
+```
+
+## Development Workflow
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ai_technical_challenge
+   ```
+
+2. **Create environment file**
+   ```bash
+   cp .env.example .env  # if available, or create manually
+   # Edit .env with your API keys
+   ```
+
+3. **Start services**
+   ```bash
+   docker compose up --build
+   ```
+
+4. **Install pre-commit hooks** (for contributors)
+   ```bash
+   poetry run pre-commit install
+   ```
+
+### Running Tests
+
+```bash
+# Run tests inside the container
+docker compose exec app poetry run pytest
+
+# Or run locally if you have Poetry installed
+poetry run pytest
+```
+
+## Configuration
+
+The application uses environment variables for configuration:
+
+- `LITELLM_API_KEY`: API key for the language model service
+- `QDRANT_URL`: URL for the Qdrant vector database
+- `ENVIRONMENT`: Deployment environment (dev/prod)
+
+## Technology Stack
+
+- **Backend**: Python 3.11, Poetry
+- **Frontend**: Streamlit
+- **Vector Database**: Qdrant
+- **Containerization**: Docker & Docker Compose
+- **Code Quality**: Black, Ruff, Pre-commit
+- **Testing**: Pytest
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Install pre-commit hooks (`poetry run pre-commit install`)
+4. Make your changes
+5. Run tests and linting
+6. Commit your changes (pre-commit hooks will run automatically)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+## License
+
+This project is part of an AI technical challenge and is intended for evaluation purposes.

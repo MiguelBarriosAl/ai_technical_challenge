@@ -33,7 +33,7 @@ $('.content-block a\[id\]').each(function() { var $anchorElement = $(this); $anc
 
 **$35 USD**
 
-For your **first standard checked bag** under 50 lbs. (23 kg), each way  
+For your **first standard checked bag** under 50 lbs. (23 kg), each way
 [+1 Free Carry-On Bag and 1 Personal Item](https://www.delta.com/eu/en/baggage/carry-on-baggage)
 
 ![second standard checked bag](https://www.delta.com/content/dam/delta-applications/fresh-air-core/Jun2018/images/icon-baggage-100.svg)
@@ -128,19 +128,19 @@ Your bag allowance may vary if your Medallion status or credit card status chang
 
 Find more information about baggage, restricted or prohibited items and exceptions for Active Military and Medallion Members. All baggage fees listed are current and applicable for all ticketing on or after today when Delta's baggage rules are determined to apply. If you ticketed at a much earlier date, please refer to Delta's [previous checked](https://www.delta.com/eu/en/baggage/checked-baggage/previous-baggage-fees) baggage page for more details.
 
-[Excess & Overweight Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/excess-overweight-baggage)  
+[Excess & Overweight Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/excess-overweight-baggage)
 Know how many bags you're allowed to check on your flight, plus the cost to bring excess baggage depending on your destination.
 
-[Military Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/military-baggage-allowance)  
+[Military Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/military-baggage-allowance)
 You serve us, and we’re delighted to serve you. Please review the bags allowed for active duty United States military personnel.
 
-[Medallion Member & Delta SkyMiles AMEX Card Member Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/medallion-baggage-allowance)  
+[Medallion Member & Delta SkyMiles AMEX Card Member Baggage](https://www.delta.com/eu/en/baggage/checked-baggage/medallion-baggage-allowance)
 We’re thankful for your loyalty. Review the complete policy for bags allowed for Medallion members and Delta SkyMiles American Express Card members.
 
-[Special Item Requirements](https://www.delta.com/eu/en/baggage/special-items/overview)  
+[Special Item Requirements](https://www.delta.com/eu/en/baggage/special-items/overview)
 See requirements for fragile items like musical instruments, sporting equipment, medical equipment or more.
 
-[Prohibited or Restricted Items](https://www.delta.com/eu/en/baggage/prohibited-or-restricted-items/overview)  
+[Prohibited or Restricted Items](https://www.delta.com/eu/en/baggage/prohibited-or-restricted-items/overview)
 For the safety of all passengers, review what items are banned items (flammables, aerosols); and restricted items (batteries).
 
 $('.content-block a\[id\]').each(function() { var $anchorElement = $(this); $anchorElement.attr('class', 'anchor-class'); });
@@ -251,7 +251,7 @@ Basic Economy: $99
 |
 |
 
-**South America, Europe, United Kingdom, Africa, Middle East, India,  
+**South America, Europe, United Kingdom, Africa, Middle East, India,
 Asia & Pacific**
 
 |
@@ -467,7 +467,7 @@ CANCEL
 
 |
 
-**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India,   
+**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India, 
 Asia & Pacific**
 
 |
@@ -508,7 +508,7 @@ CANCEL
 
 |
 
-**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India,   
+**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India, 
 Asia & Pacific**
 
 |
@@ -563,7 +563,7 @@ CANCEL
 
 |
 
-**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India,   
+**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India, 
 Asia & Pacific**
 
 |
@@ -616,7 +616,7 @@ CANCEL
 
 |
 
-**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India,   
+**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India, 
 Asia & Pacific**
 
 |
@@ -669,17 +669,17 @@ CANCEL
 
 |
 
-**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India,   
+**United States, Canada, Mexico, Caribbean, Central America, South America, Europe, United Kingdom, Africa, Middle East, India, 
 Asia & Pacific**
 
 |
 
-[Fees waived  
+[Fees waived
  at this time](https://www.delta.com/eu/en/advisories/other-alerts/change-cancel-waiver-from-asia-and-oceania)
 
 |
 
-[Fees waived  
+[Fees waived
 at this time](https://www.delta.com/eu/en/advisories/other-alerts/change-cancel-waiver-from-asia-and-oceania)
 
 |
