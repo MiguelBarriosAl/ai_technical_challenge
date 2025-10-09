@@ -5,6 +5,7 @@ import tempfile
 import fitz
 import pytest
 from unittest.mock import Mock
+from travel_assistant.rag.indexer_service import IndexerService
 
 
 @pytest.fixture
@@ -101,3 +102,67 @@ def mock_fitz_document():
     mock_doc.__iter__ = Mock(return_value=iter([mock_page]))
     mock_doc.close = Mock()
     return mock_doc
+
+
+# IndexerService fixtures
+@pytest.fixture
+def mock_qdrant_repo():
+    """Mock Qdrant repository."""
+    mock_repo = Mock()
+    mock_repo.ensure_collection = Mock()
+    mock_repo.upsert_points = Mock()
+    return mock_repo
+
+
+@pytest.fixture
+def mock_embeddings_provider():
+    """Mock embeddings provider."""
+    mock_provider = Mock()
+    # Default: return valid 1536-dimensional vectors
+    mock_provider.embed_texts.return_value = [
+        [0.1] * 1536,
+        [0.2] * 1536,
+        [0.3] * 1536,
+    ]
+    return mock_provider
+
+
+@pytest.fixture
+def indexer_service(mock_qdrant_repo, mock_embeddings_provider):
+    """Create IndexerService instance with mocked dependencies."""
+
+    return IndexerService(mock_qdrant_repo, mock_embeddings_provider)
+
+
+@pytest.fixture
+def sample_chunks():
+    """Sample chunks data for testing."""
+    return [
+        {
+            "text": "Sample airline policy text 1",
+            "airline": "Delta",
+            "locale": "en-US",
+            "policy_version": "2024.1",
+            "doc_id": "delta_policy_001",
+            "chunk_id": 1,
+            "source": "/policies/Delta/policy.md",
+        },
+        {
+            "text": "Another policy chunk with different content",
+            "airline": "American Airlines",
+            "locale": "en-US",
+            "policy_version": "2024.2",
+            "doc_id": "aa_policy_002",
+            "chunk_id": 2,
+            "source": "/policies/AmericanAirlines/baggage.md",
+        },
+        {
+            "text": "Third chunk for comprehensive testing",
+            "airline": "United",
+            "locale": "es-ES",
+            "policy_version": "2024.1",
+            "doc_id": "united_policy_003",
+            "chunk_id": 1,
+            "source": "/policies/United/pets.pdf",
+        },
+    ]
