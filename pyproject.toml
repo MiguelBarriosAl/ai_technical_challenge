@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "travel-assistant"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "AI Technical Challenge - Airline Policy RAG Chatbot"
+authors = ["Miguel Barrios <miguel.barrios@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4.0.0"
+python = ">=3.11,<4.0"
 fastapi = "^0.118.2"
 uvicorn = "^0.37.0"
 pymupdf = "^1.26.4"
@@ -15,9 +15,17 @@ langchain-text-splitters = "^0.3.11"
 langchain-openai = "^0.3.35"
 langchain-huggingface = "^0.3.1"
 langchain-community = "^0.3.31"
-sentence-transformers = "^5.1.1"
+sentence-transformers = "2.7.0"
 pydantic-settings = "^2.11.0"
+qdrant-client = "^1.9"
+torch = "2.7.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.9.0"
+ruff = "^0.14.0"
+pytest = "^8.4.2"
+pre-commit = "^4.3.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.8.0,<2.0.0"]
 build-backend = "poetry.core.masonry.api"
