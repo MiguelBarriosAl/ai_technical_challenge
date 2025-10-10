@@ -8,15 +8,19 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml poetry.lock ./ README.md ./
+COPY pyproject.toml poetry.lock README.md ./
 
-RUN pip install --no-cache-dir poetry
+RUN pip install --no-cache-dir poetry==2.2.1
 
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
 COPY travel_assistant ./travel_assistant
 COPY policies ./policies
 
+RUN poetry install --no-interaction --no-ansi
+
 EXPOSE 8501
 
-CMD ["streamlit", "run", "travel_assistant/app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENV PYTHONPATH="/app"
+
+CMD ["streamlit", "run", "travel_assistant/app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]

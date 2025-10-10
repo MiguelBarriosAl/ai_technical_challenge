@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict
 from qdrant_client.models import PointStruct
 from travel_assistant.core.errors import IndexingError
-from travel_assistant.core.constants import VECTOR_SIZE
+from travel_assistant.core.settings import settings
 
 
 logger = logging.getLogger(__name__)
@@ -43,12 +43,14 @@ class IndexerService:
             texts = [c["text"] for c in chunks]
             vectors = self.embeddings_provider.embed_texts(texts)
 
-            if not vectors or len(vectors[0]) != VECTOR_SIZE:
+            if not vectors or len(vectors[0]) != settings.VECTOR_SIZE:
                 raise IndexingError("Embedding dimension mismatch or empty vector output.")
 
             points = []
             for chunk, vector in zip(chunks, vectors):
-                point_id = f"{chunk['doc_id']}:{chunk['policy_version']}:{chunk['chunk_id']}"
+                # Generate a valid point ID by hashing the combination of identifiers
+                id_string = f"{chunk['doc_id']}:{chunk['policy_version']}:{chunk['chunk_id']}"
+                point_id = hashlib.md5(id_string.encode()).hexdigest()
                 payload = {
                     "airline": chunk["airline"],
                     "locale": chunk["locale"],

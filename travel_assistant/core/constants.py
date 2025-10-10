@@ -12,5 +12,7 @@ SCORE_THRESHOLD: Annotated[float, "Minimum similarity score threshold"] = 0.2
 VECTOR_SIZE: Annotated[int, "Size of the embedding vectors"] = (
     1536  # OpenAI's text-embedding-ada-002 vector size
 )
+# Ingestion Configuration
+SUPPORTED_FILE_FORMATS: Annotated[set[str], "Allowed document extensions"] = {".md", ".pdf"}
 
 # LLM Configuration

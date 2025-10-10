@@ -10,6 +10,18 @@ services:
       - ./qdrant_storage:/qdrant/storage
     restart: unless-stopped
 
+  ingest:
+    build: .
+    container_name: travel_assistant_ingest
+    depends_on:
+      - qdrant
+    env_file:
+      - .env.docker
+    volumes:
+      - ./policies:/app/policies
+    command: >
+      python -c "from travel_assistant.rag.ingestion.cli import main; main()"
+
   app:
     build: .
     container_name: travel_assistant
@@ -17,12 +29,13 @@ services:
       - "8501:8501"
     depends_on:
       - qdrant
+      - ingest
     env_file:
-      - .env
+      - .env.docker
     volumes:
       - .:/app
       - ./policies:/app/policies
     command: >
-      poetry run streamlit run travel_assistant/app/app.py
+      streamlit run travel_assistant/app/main.py
       --server.port=8501
       --server.address=0.0.0.0
