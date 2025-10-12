@@ -2,9 +2,9 @@ import logging
 from pathlib import Path
 
 from travel_assistant.core.constants import SUPPORTED_FILE_FORMATS
-from travel_assistant.rag.doc_loader import load_document
-from travel_assistant.rag.splitter import split_text
-from travel_assistant.rag.indexer_service import IndexerService
+from travel_assistant.rag.ingestion.doc_loader import load_document
+from travel_assistant.rag.ingestion.splitter import split_text
+from travel_assistant.rag.ingestion.indexer_service import IndexerService
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 from travel_assistant.core.settings import settings
 from travel_assistant.infra.qdrant_repository import QdrantRepository
 from travel_assistant.infra.embeddings import EmbeddingsProvider
-from travel_assistant.rag.indexer_service import IndexerService
+from travel_assistant.rag.ingestion.indexer_service import IndexerService
 from travel_assistant.rag.ingestion.ingest_service import run_ingestion
 
 

@@ -18,7 +18,7 @@ class RAGGenerationService:
         Args:
             llm_client: LLM client for generating responses
         """
-        self.llm_client = llm_client or OpenAILLMClient()
+        self.llm_client = llm_client or OpenAILLMClient()  # Default to OpenAI client
 
     def generate_answer(self, question: str, context: str) -> str:
         """
