@@ -1,45 +1,57 @@
+"""
+Travel Assistant API - Main Application
+FastAPI application with RAG endpoints for airline policy queries.
+"""
+
 import logging
-from fastapi import FastAPI, HTTPException
-from travel_assistant.rag.context_builder import ContextBuilder
-from travel_assistant.rag.queries import MetadataQuery
-from travel_assistant.rag.retriever_service import RetrieverService
-from travel_assistant.rag.generation_service import RAGGenerationService
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from travel_assistant.app.error_handlers import register_error_handlers
-from travel_assistant.app.models.ask_models import AskRequest
+from travel_assistant.app.routes import router
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-app = FastAPI(title="Travel Assistant AI")
-
-register_error_handlers(app)
-retriever = RetrieverService(collection_name="airline_policies", k=5)
-context_builder = ContextBuilder(max_length=3000)
-generation_service = RAGGenerationService()
 
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+@asynccontextmanager
+async def lifespan(fastapi_app: FastAPI):
+    """
+    Application lifespan manager.
+    Handles startup and shutdown events.
+    """
+    # Startup
+    logger.info("Starting Travel Assistant API...")
+    yield
+    # Shutdown
+    logger.info("Shutting down Travel Assistant API...")
 
 
-@app.post("/ask")
-async def ask(req: AskRequest):
-    try:
-        query = MetadataQuery(
-            airline=req.airline, locale=req.locale, policy_version=req.policy_version
-        )
+def create_app() -> FastAPI:
+    """
+    Creates and configures FastAPI application instance.
 
-        # Step 1: Retrieve fragments from Qdrant
-        fragments = retriever.retrieve(req.question, query)
+    Returns:
+        Configured FastAPI application instance
+    """
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
 
-        # Step 2: Build context
-        context = context_builder.build(fragments)
+    # Create FastAPI app with lifespan management
+    fastapi_app = FastAPI(
+        title="Travel Assistant AI",
+        description="RAG-powered travel assistant for airline policy queries",
+        version="1.0.0",
+        lifespan=lifespan,
+    )
 
-        # Step 3: Generate answer using RAG
-        answer = generation_service.generate_answer(req.question, context)
+    # Register error handlers
+    register_error_handlers(fastapi_app)
 
-        return {"question": req.question, "context": context, "answer": answer}
+    # Include routers
+    fastapi_app.include_router(router)
 
-    except Exception as e:
-        logger.exception("Error processing question")
-        raise HTTPException(status_code=500, detail=str(e))
+    logger.info("FastAPI application configured successfully")
+    return fastapi_app
+
+
+# Create the app instance
+app = create_app()

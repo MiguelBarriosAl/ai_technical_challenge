@@ -25,8 +25,7 @@ def extract_text_from_pdf(file_path: str) -> str:
         # If the document is not a digital PDF (i.e., contains only images)
         if not text.strip():
             raise ExtractionError(
-                f"PDF '{file_path}' appears to contain only images. "
-                "OCR required. # TODO: integrate PaddleOCR."
+                f"PDF '{file_path}' appears to contain only images. " "OCR required."
             )
 
         return text
