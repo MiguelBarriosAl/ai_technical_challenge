@@ -6,9 +6,9 @@ Simple and direct route definitions.
 import logging
 from fastapi import APIRouter, HTTPException
 from travel_assistant.rag.queries import MetadataQuery
-from travel_assistant.rag.context_builder import ContextBuilder
-from travel_assistant.rag.retriever_service import RetrieverService
-from travel_assistant.rag.generation_service import RAGGenerationService
+from travel_assistant.rag.pipeline.context_builder import ContextBuilder
+from travel_assistant.rag.pipeline.retriever_service import RetrieverService
+from travel_assistant.rag.pipeline.generation_service import RAGGenerationService
 from travel_assistant.infra.embeddings import EmbeddingsProvider
 from travel_assistant.core.settings import settings
 from travel_assistant.app.models.ask_models import AskRequest

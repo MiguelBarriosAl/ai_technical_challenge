@@ -3,13 +3,13 @@ Tests for RetrieverService to verify dependency injection.
 """
 
 from unittest.mock import Mock, patch
-from travel_assistant.rag.retriever_service import RetrieverService
+from travel_assistant.rag.pipeline.retriever_service import RetrieverService
 
 
 class TestRetrieverService:
     """Test suite for RetrieverService with dependency injection."""
 
-    @patch("travel_assistant.rag.retriever_service.QdrantRepository")
+    @patch("travel_assistant.rag.pipeline.retriever_service.QdrantRepository")
     def test_dependency_injection(self, mock_qdrant_repo):
         """Test that RetrieverService accepts injected dependencies."""
         # Arrange
@@ -27,7 +27,7 @@ class TestRetrieverService:
         assert retriever.k == k
         assert retriever.embedding_provider == mock_embedding_provider
 
-    @patch("travel_assistant.rag.retriever_service.QdrantRepository")
+    @patch("travel_assistant.rag.pipeline.retriever_service.QdrantRepository")
     def test_uses_settings_vector_size(self, mock_qdrant_repo):
         """Test that RetrieverService uses VECTOR_SIZE from settings."""
         # Arrange
@@ -48,7 +48,7 @@ class TestRetrieverService:
         )
         assert retriever.collection_name == collection_name
 
-    @patch("travel_assistant.rag.retriever_service.QdrantRepository")
+    @patch("travel_assistant.rag.pipeline.retriever_service.QdrantRepository")
     def test_retrieve_calls_embeddings_and_search(self, mock_qdrant_repo):
         """Test that retrieve method properly calls embeddings and search."""
         # Arrange
@@ -85,7 +85,7 @@ class TestRetrieverService:
         """Test that default k value is 5."""
         mock_embedding_provider = Mock()
 
-        with patch("travel_assistant.rag.retriever_service.QdrantRepository"):
+        with patch("travel_assistant.rag.pipeline.retriever_service.QdrantRepository"):
             retriever = RetrieverService(
                 collection_name="test_collection", embedding_provider=mock_embedding_provider
             )
@@ -95,7 +95,7 @@ class TestRetrieverService:
         """Test that custom k value is properly set."""
         mock_embedding_provider = Mock()
 
-        with patch("travel_assistant.rag.retriever_service.QdrantRepository"):
+        with patch("travel_assistant.rag.pipeline.retriever_service.QdrantRepository"):
             custom_k = 10
             retriever = RetrieverService(
                 collection_name="test_collection",
