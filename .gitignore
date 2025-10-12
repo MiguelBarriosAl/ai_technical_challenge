@@ -18,4 +18,6 @@ env/
 qdrant_storage
 
 # Ignore logs
+*.log
 server.log
+fastapi.log
