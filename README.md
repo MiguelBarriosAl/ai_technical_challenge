@@ -2,7 +2,7 @@
 
 A RAG (Retrieval-Augmented Generation) powered travel assistant application that helps users with travel-related queries using airline policies as a knowledge base. The system combines vector search capabilities with AI language models to provide accurate and contextual responses.
 
-## 🚀 Quick Start (Reproducible Setup)
+## Quick Start
 
 ### Prerequisites
 
@@ -10,60 +10,56 @@ A RAG (Retrieval-Augmented Generation) powered travel assistant application that
 - [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0+)
 - OpenAI API Key
 
-### 1. Clone and Setup
+### Setup and Run
 
-```bash
-git clone <repository-url>
-cd ai_technical_challenge
-```
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ai_technical_challenge
+   ```
 
-### 2. Configure Environment Variables
+2. **Configure environment**
+   ```bash
+   # Create environment file with your OpenAI API key
+   cp .env.docker.example .env.docker
+   # Edit .env.docker and add your API key:
+   # LITELLM_API_KEY=sk-your-actual-openai-api-key-here
+   ```
 
-**CRITICAL**: Create and configure your `.env.docker` file with your real API key:
+3. **Start the application** (One command - includes tests, build, and deployment)
+   ```bash
+   make
+   ```
 
-```bash
-# Copy the template
-cp .env.docker .env.docker.local
+The system will:
+- Run comprehensive tests
+- Build Docker images
+- Deploy all services (Qdrant + Web App)
+- Ingest airline policy documents
+- Verify system health
 
-# Edit with your real API key
-nano .env.docker
-```
+### Access the Application
 
-Update the `.env.docker` file:
-```bash
-LITELLM_API_KEY=sk-your-real-openai-api-key-here
-QDRANT_URL=http://qdrant:6333
-ENVIRONMENT=dev
-EMBEDDING_MODEL=text-embedding-3-small
-VECTOR_SIZE=1536
-```
-
-⚠️ **Important**: Replace `sk-your-real-openai-api-key-here` with your actual OpenAI API key from https://platform.openai.com/api-keys
-
-### 3. Start the System
-
-```bash
-# Build and start all services (first time)
-docker compose up --build
-
-# Or start with data ingestion (if needed)
-docker compose up qdrant ingest
-
-# Then start the web application
-docker compose up app
-```
-
-### 4. Access the Application
-
-- **Web App**: http://localhost:8501
+- **Web Interface**: http://localhost:8501
 - **Qdrant Dashboard**: http://localhost:6333/dashboard
 - **API Health**: http://localhost:6333/collections/airline_policies
 
-## ✅ Verification Steps
+### Additional Commands
 
-### Check if Data Ingestion was Successful
+```bash
+make          # Run
+make help     # Show all available commands
+make test     # Run tests only
+make clean    # Stop all services
+make status   # Check service status
+make logs     # View service logs
+```
 
-After running `docker compose up`, verify that documents were properly indexed:
+## Verification
+
+### Check System Status
+
+After running `make`, verify that everything is working:
 
 ```bash
 # 1. Check Qdrant collection status and document count
@@ -116,103 +112,35 @@ curl -X POST "http://localhost:6333/collections/airline_policies/points/scroll" 
 ```
 
 ```bash
-# 3. Verify all services are running
-docker compose ps
+# 3. Check service health
+make status
 ```
 
-**Expected Output:**
-```
-NAME                     IMAGE                      STATUS
-qdrant                   qdrant/qdrant:latest       Up
-travel_assistant         ai_technical_challenge-*   Up
-travel_assistant_ingest  ai_technical_challenge-*   Exited (0) ✓
-```
-*Note: `travel_assistant_ingest` exits with code 0 after successful ingestion*
-
-### Access the Application
-
-- **🌐 Web Interface**: http://localhost:8501
-- **📊 Qdrant Dashboard**: http://localhost:6333/dashboard
-- **🔍 Quick API Test**: http://localhost:6333/collections/airline_policies
-
-### Troubleshooting Verification
-
-**✅ Success Indicators:**
+**Success Indicators:**
 - Qdrant collection shows `"status":"green"` and `"points_count":183`
-- Documents contain metadata from all airlines: `American Airlines`, `Delta`, `United`
-- Streamlit app loads without errors at http://localhost:8501
+- All services show status "Up"
+- Web interface responds at http://localhost:8501
 - You can ask questions about airline policies and get relevant responses
 
-**❌ Common Issues:**
-- `points_count: 0` → API key invalid or ingestion failed
-- Connection errors → Services not running or wrong ports
-- Empty responses → No data ingested or collection doesn't exist
+## System Architecture
 
-## 🔧 Complete Reproduction Guide
+### Troubleshooting
 
-### For a Fresh Environment (New Machine)
+**API Key Issues:**
+- Ensure `.env.docker` contains valid OpenAI API key starting with `sk-`
+- Check key has sufficient credits and permissions
 
-This section shows how to completely reproduce the system from scratch:
-
+**System Issues:**
 ```bash
-# 1. Clone repository
-git clone <your-repo-url>
-cd ai_technical_challenge
-
-# 2. Clean any existing Docker state (optional)
-docker system prune -f
-docker compose down
-sudo rm -rf qdrant_storage/*
-
-# 3. Set up environment variables
-cp .env.docker.example .env.docker
-# Edit .env.docker with your real OpenAI API key
-
-# 4. Build and run complete system
-docker compose build --no-cache
-docker compose up
-
-# 5. Verify installation (in another terminal)
-curl -X GET "http://localhost:6333/collections/airline_policies"
+make clean    # Stop all services
+make          # Restart complete pipeline
+make logs     # Check service logs
 ```
 
-### Build Time Expectations
-- **Fresh build**: ~45 seconds (optimized dependencies)
-- **Data ingestion**: ~30 seconds (183 documents)
-- **Total startup**: ~75 seconds from zero to ready
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**1. API Key Error (401 Unauthorized)**
+**Build Issues:**
 ```bash
-# Check your .env.docker file has a valid OpenAI API key
-cat .env.docker
-# Make sure LITELLM_API_KEY starts with "sk-proj-" or "sk-" and is valid
-```
-
-**2. No Data in Qdrant (points_count: 0)**
-```bash
-# Run data ingestion manually
-docker compose up qdrant ingest
-```
-
-**3. Port Already in Use**
-```bash
-# Check what's using the ports
-lsof -i :6333  # Qdrant
-lsof -i :8501  # Streamlit
-
-# Stop conflicting services or change ports in docker-compose.yml
-```
-
-**4. Build Errors**
-```bash
-# Clean rebuild
-docker compose down
-docker system prune -f
-docker compose build --no-cache
+make clean    # Clean everything
+make build    # Rebuild images
 ```
 
 ## Architecture
