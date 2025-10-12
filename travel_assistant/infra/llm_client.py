@@ -1,8 +1,3 @@
-"""
-Pure LLM client for external API communication.
-Follows Single Responsibility Principle - only handles API calls.
-"""
-
 from abc import ABC, abstractmethod
 import logging
 from langchain_openai import ChatOpenAI

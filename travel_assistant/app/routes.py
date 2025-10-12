@@ -9,6 +9,8 @@ from travel_assistant.rag.queries import MetadataQuery
 from travel_assistant.rag.context_builder import ContextBuilder
 from travel_assistant.rag.retriever_service import RetrieverService
 from travel_assistant.rag.generation_service import RAGGenerationService
+from travel_assistant.infra.embeddings import EmbeddingsProvider
+from travel_assistant.core.settings import settings
 from travel_assistant.app.models.ask_models import AskRequest
 
 logger = logging.getLogger(__name__)
@@ -16,8 +18,11 @@ logger = logging.getLogger(__name__)
 # Create API router
 router = APIRouter()
 
-# Initialize services (simple approach)
-retriever = RetrieverService(collection_name="airline_policies", k=5)
+# Initialize services with dependency injection
+embedding_provider = EmbeddingsProvider(model_name=settings.EMBEDDING_MODEL)
+retriever = RetrieverService(
+    collection_name="airline_policies", embedding_provider=embedding_provider, k=5
+)
 context_builder = ContextBuilder(max_length=3000)
 generation_service = RAGGenerationService()
 

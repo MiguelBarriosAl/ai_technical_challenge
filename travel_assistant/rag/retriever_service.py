@@ -6,9 +6,9 @@ import logging
 from typing import List
 from urllib.parse import urlparse
 
-from travel_assistant.infra.embeddings import EmbeddingsProvider
 from travel_assistant.infra.qdrant_repository import QdrantRepository
 from travel_assistant.rag.queries import BaseQuery
+from travel_assistant.infra.embedding_interface import EmbeddingProvider
 from travel_assistant.core.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 class RetrieverService:
     """Service responsible for retrieving relevant documents from Qdrant."""
 
-    def __init__(self, collection_name: str, k: int = 5):
+    def __init__(self, collection_name: str, embedding_provider: EmbeddingProvider, k: int = 5):
         self.collection_name = collection_name
         self.k = k
+        self.embedding_provider = embedding_provider
 
         # Parse Qdrant connection settings
         parsed_url = urlparse(settings.QDRANT_URL)
@@ -32,7 +33,6 @@ class RetrieverService:
             collection_name=collection_name,
             vector_size=settings.VECTOR_SIZE,
         )
-        self.embeddings_provider = EmbeddingsProvider(model_name="text-embedding-3-small")
 
     def retrieve(self, query_text: str, query: BaseQuery) -> List[str]:
         """
@@ -49,7 +49,7 @@ class RetrieverService:
         """
         logger.info("Starting retrieval process for query: %s", query_text)
 
-        embedding = self.embeddings_provider.embed_texts([query_text])[0]
+        embedding = self.embedding_provider.embed_query(query_text)
         logger.debug("Embedding generated for query text.")
 
         filter_query = query.build()
