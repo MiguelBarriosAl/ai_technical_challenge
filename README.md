@@ -2,52 +2,156 @@
 
 A RAG (Retrieval-Augmented Generation) powered travel assistant application that helps users with travel-related queries using airline policies as a knowledge base. The system combines vector search capabilities with AI language models to provide accurate and contextual responses.
 
+## Quick Start
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/get-started) (version 20.10+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0+)
+- OpenAI API Key
+
+### Setup and Run
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ai_technical_challenge
+   ```
+
+2. **Configure environment**
+   ```bash
+   # Create environment file with your OpenAI API key
+   cp .env.docker.example .env.docker
+   # Edit .env.docker and add your API key:
+   # LITELLM_API_KEY=sk-your-actual-openai-api-key-here
+   ```
+
+3. **Start the application** (One command - includes tests, build, and deployment)
+   ```bash
+   make
+   ```
+
+The system will:
+- Run comprehensive tests
+- Build Docker images
+- Deploy all services (Qdrant + Web App)
+- Ingest airline policy documents
+- Verify system health
+
+### Access the Application
+
+- **Web Interface**: http://localhost:8501
+- **Qdrant Dashboard**: http://localhost:6333/dashboard
+- **API Health**: http://localhost:6333/collections/airline_policies
+
+### Additional Commands
+
+```bash
+make          # Run
+make help     # Show all available commands
+make test     # Run tests only
+make clean    # Stop all services
+make status   # Check service status
+make logs     # View service logs
+```
+
+## Verification
+
+### Check System Status
+
+After running `make`, verify that everything is working:
+
+```bash
+# 1. Check Qdrant collection status and document count
+curl -X GET "http://localhost:6333/collections/airline_policies"
+```
+
+**Expected Response:**
+```json
+{
+  "result": {
+    "status": "green",
+    "points_count": 183,
+    "indexed_vectors_count": 183,
+    "vectors_count": 183,
+    "segments_count": 1,
+    "config": {
+      "params": {
+        "vectors": {
+          "size": 1536,
+          "distance": "Cosine"
+        }
+      }
+    }
+  }
+}
+```
+
+```bash
+# 2. Check some indexed documents with metadata
+curl -X POST "http://localhost:6333/collections/airline_policies/points/scroll" \
+  -H "Content-Type: application/json" \
+  -d '{"limit": 3, "with_payload": true, "with_vector": false}'
+```
+
+**Expected Response:**
+```json
+{
+  "result": {
+    "points": [
+      {
+        "id": "uuid-here",
+        "payload": {
+          "source": "policies/AmericanAirlines/Policy.md",
+          "page_content": "American Airlines policy content..."
+        }
+      }
+    ]
+  }
+}
+```
+
+```bash
+# 3. Check service health
+make status
+```
+
+**Success Indicators:**
+- Qdrant collection shows `"status":"green"` and `"points_count":183`
+- All services show status "Up"
+- Web interface responds at http://localhost:8501
+- You can ask questions about airline policies and get relevant responses
+
+## System Architecture
+
+### Troubleshooting
+
+**API Key Issues:**
+- Ensure `.env.docker` contains valid OpenAI API key starting with `sk-`
+- Check key has sufficient credits and permissions
+
+**System Issues:**
+```bash
+make clean    # Stop all services
+make          # Restart complete pipeline
+make logs     # Check service logs
+```
+
+**Build Issues:**
+```bash
+make clean    # Clean everything
+make build    # Rebuild images
+```
+
 ## Architecture
 
 This project consists of:
 
-- **Travel Assistant API**: A Streamlit-based web application that serves as the user interface
-- **Qdrant Vector Database**: Stores and retrieves policy documents using vector embeddings
-- **RAG System**: Combines retrieval and generation for intelligent responses
-- **Policy Documents**: Airline policies from American Airlines, Delta, and United
-
-## Prerequisites
-
-Before starting, ensure you have the following installed:
-
-- [Docker](https://www.docker.com/get-started) (version 20.10+)
-- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0+)
-
-## Environment Setup
-
-### 1. Environment Configuration
-
-Create a `.env` file in the project root directory. **This file is required** for the service to start properly.
-
-```bash
-# Example .env file
-LITELLM_API_KEY=your_api_key_here
-QDRANT_URL=http://qdrant:6333
-ENVIRONMENT=dev
-```
-
-**Important**: Without the `.env` file, the containers will fail to start.
-
-### 2. Build and Run
-
-Since there's no Makefile in the current setup, use Docker Compose directly:
-
-```bash
-# Build and start all services
-docker compose up --build
-
-# Or run in detached mode
-docker compose up --build -d
-```
-
-This command will:
-- Build the application Docker image using the local Dockerfile
-- Start Qdrant vector database on port 6333
+- **Streamlit Web App**: User interface on port 8501
+- **Qdrant Vector Database**: Document storage and vector search on port 6333
+- **RAG Ingestion**: Processes airline policies into searchable chunks
+- **OpenAI Embeddings**: High-quality text embeddings via API
+- **Policy Documents**: American Airlines, Delta, and United policies
 - Start the Streamlit application on port 8501
 - Set up the necessary volume mounts and networking
 
@@ -57,16 +161,46 @@ Once the containers are running, access the application at:
 
 **http://localhost:8501**
 
-## Stopping Services
-
-To stop and remove all containers:
+## 🐳 Docker Commands Reference
 
 ```bash
-docker compose down
+# Start everything (recommended)
+docker compose up --build
 
-# To also remove volumes (will delete stored data)
-docker compose down -v
+# Start only specific services
+docker compose up qdrant          # Just the database
+docker compose up qdrant ingest   # Database + data ingestion
+docker compose up app             # Just the web app (needs data)
+
+# Check logs
+docker compose logs app           # Streamlit logs
+docker compose logs qdrant        # Database logs
+docker compose logs ingest        # Ingestion logs
+
+# Stop services
+docker compose down               # Stop and remove containers
+docker compose down -v           # Also remove data volumes
+
+# Rebuild from scratch
+docker compose down
+docker compose build --no-cache
+docker compose up
 ```
+
+## 💡 Development Notes
+
+### Why This Setup Works
+- ✅ **No local Python environment needed** - Everything runs in Docker
+- ✅ **Fast builds** - ~4 seconds (no heavy ML dependencies)
+- ✅ **Lightweight images** - ~500MB (vs 3+ GB with sentence-transformers)
+- ✅ **Production ready** - OpenAI embeddings for quality
+- ✅ **Persistent data** - Qdrant data survives container restarts
+
+### For Production Deployment
+- Update `.env.docker` with production API keys
+- Use Docker secrets for sensitive data
+- Configure proper networking and load balancing
+- Monitor OpenAI API usage and costs
 
 ## Project Structure
 

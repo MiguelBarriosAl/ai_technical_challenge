@@ -9,7 +9,9 @@ class Settings(BaseSettings):
 
     LITELLM_API_KEY: str | None = None
     QDRANT_URL: str = "http://localhost:6333"
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
     ENVIRONMENT: str
+    VECTOR_SIZE: int = 1536  # Default for OpenAI's text-embedding-ada-002
 
     class Config:
         env_file = ".env"
