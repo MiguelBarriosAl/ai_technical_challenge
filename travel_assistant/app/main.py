@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from travel_assistant.rag.context_builder import ContextBuilder
 from travel_assistant.rag.queries import MetadataQuery
 from travel_assistant.rag.retriever_service import RetrieverService
+from travel_assistant.rag.generation_service import RAGGenerationService
 from travel_assistant.app.error_handlers import register_error_handlers
 from travel_assistant.app.models.ask_models import AskRequest
 
@@ -13,6 +14,7 @@ app = FastAPI(title="Travel Assistant AI")
 register_error_handlers(app)
 retriever = RetrieverService(collection_name="airline_policies", k=5)
 context_builder = ContextBuilder(max_length=3000)
+generation_service = RAGGenerationService()
 
 
 @app.get("/health")
@@ -33,8 +35,9 @@ async def ask(req: AskRequest):
         # Step 2: Build context
         context = context_builder.build(fragments)
 
-        # Step 3: Return simulated LLM response
-        answer = f"(Simulated LLM answer) Based on {len(fragments)} fragments."
+        # Step 3: Generate answer using RAG
+        answer = generation_service.generate_answer(req.question, context)
+
         return {"question": req.question, "context": context, "answer": answer}
 
     except Exception as e:
