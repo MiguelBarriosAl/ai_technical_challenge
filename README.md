@@ -31,6 +31,14 @@ A RAG (Retrieval-Augmented Generation) powered travel assistant application that
    make
    ```
 
+4. **Access the application**
+   - **Web Interface**: http://localhost:3000 (Simple frontend with example queries)
+   - **API Endpoints**: http://localhost:8080 (FastAPI documentation)
+
+   The web interface includes predefined example queries from the technical challenge.
+   make
+   ```
+
 The system will:
 - Run comprehensive tests
 - Build Docker images

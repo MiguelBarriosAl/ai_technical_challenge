@@ -65,8 +65,8 @@ deploy:
 	@sleep 5
 	@echo "Running data ingestion..."
 	@docker-compose up ingest
-	@echo "Starting web application..."
-	@docker-compose up -d app
+	@echo "Starting API and Frontend services..."
+	@docker-compose up -d api frontend
 	@echo "Services deployed successfully!"
 
 # Verify deployment health
@@ -82,10 +82,16 @@ verify:
 	else \
 		echo "ERROR: No data found in vector database"; exit 1; \
 	fi
-	@echo "Checking web application..."
+	@echo "Checking API service..."
 	@sleep 5
-	@curl -s http://localhost:8501 >/dev/null || { echo "WARNING: Web application may still be starting up"; }
+	@curl -s http://localhost:8080/health >/dev/null || { echo "WARNING: API service may still be starting up"; }
+	@echo "Checking frontend service..."
+	@curl -s http://localhost:3000 >/dev/null || { echo "WARNING: Frontend may still be starting up"; }
 	@echo "Health check completed successfully!"
+	@echo ""
+	@echo "🎉 All services are running! Access the application at:"
+	@echo "   Frontend: http://localhost:3000"
+	@echo "   API:      http://localhost:8080"
 
 # Development mode - skip tests for faster iteration
 dev: check-deps build deploy
