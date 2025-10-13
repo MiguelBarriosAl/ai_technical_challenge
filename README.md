@@ -125,22 +125,6 @@ ai_technical_challenge/
 - **Nginx**: Web server for static frontend
 - **Docker**: Containerization and orchestration
 
-
-
-## Testing and Development
-
-```bash
-# Tests with make
-make test
-
-# Tests with Docker directly
-docker-compose run --rm api poetry run pytest
-
-# Linting and formatting
-poetry run ruff check .
-poetry run black .
-```
-
 ## Code Quality & Pre-commit Hooks
 
 This project uses pre-commit hooks to ensure code quality and consistent formatting.
@@ -160,30 +144,6 @@ The project includes automated checks for:
 - **Ruff**: Fast Python linter with auto-fix
 - **Trailing whitespace**: Removes extra spaces
 - **End-of-file**: Ensures proper file endings
-
-### Manual Execution
-```bash
-# Run on all files
-pre-commit run --all-files
-```
-
-## Usage Examples
-
-### Query via API
-```bash
-curl -X POST "http://localhost:8080/ask" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "question": "What are the baggage restrictions for Delta flights?",
-    "airline": "Delta",
-    "locale": "en-US"
-  }'
-```
-
-### Query via Frontend
-1. Open http://localhost:3000
-2. Use the web interface to ask questions
-3. View contextual responses based on policies
 
 ## Tech Stack
 
