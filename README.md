@@ -83,9 +83,8 @@ curl -X POST "http://localhost:8080/ask" \
 ### 3. Verify Frontend
 ```bash
 # Web interface available
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+http://localhost:3000
 ```
-**Expected response:** `200`
 
 ### 4. Check Services Status
 ```bash
