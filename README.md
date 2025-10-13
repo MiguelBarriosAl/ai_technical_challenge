@@ -29,14 +29,20 @@ make          # Execute: tests → build → deploy → verify
 ### 3. Verify Services
 ```bash
 # Frontend
-curl http://localhost:3000
+http://localhost:3000
 
 # API
 curl http://localhost:8080/health
 
+# Test RAG query
+curl -X POST "http://localhost:8080/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Can I travel with pets on Delta?", "airline": "Delta", "locale": "en-US"}'
+
 # Qdrant Vector DB
 curl http://localhost:6333/collections/airline_policies
 ```
+
 
 ## Docker Services
 
@@ -59,41 +65,6 @@ make clean    # Stop and clean all services
 make status   # Containers status
 make logs     # Show logs
 ```
-
-## System Verification
-
-### 1. Verify Qdrant (Vector DB)
-```bash
-# Collection status
-curl "http://localhost:6333/collections/airline_policies"
-```
-**Expected response:** `"status":"green"`, `"points_count":183`
-
-### 2. Verify API Backend
-```bash
-# Health check
-curl "http://localhost:8080/health"
-
-# Test RAG query
-curl -X POST "http://localhost:8080/ask" \
-  -H "Content-Type: application/json" \
-  -d '{"question": "Can I travel with pets on Delta?", "airline": "Delta", "locale": "en-US"}'
-```
-
-### 3. Verify Frontend
-```bash
-# Web interface available
-http://localhost:3000
-```
-
-### 4. Check Services Status
-```bash
-make status
-```
-
-
-
-
 
 ## Project Structure
 
