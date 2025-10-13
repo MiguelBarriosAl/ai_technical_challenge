@@ -110,22 +110,34 @@ ai_technical_challenge/
 │   │   ├── settings.py           # Environment variables & config
 │   │   ├── constants.py          # Application constants
 │   │   └── errors.py             # Custom exception classes
-│   ├── rag/                      # RAG logic (ingestion, retrieval, generation)
-│   │   ├── ingestion/            # Document processing pipeline
-│   │   ├── retriever_service.py  # Vector similarity search
-│   │   ├── generation_service.py # LLM response generation
-│   │   └── context_builder.py    # Context assembly for prompts
+│   ├── rag/                      # RAG system components
+│   │   ├── ingestion/            # Document processing and indexing
+│   │   │   ├── cli.py            # Ingestion CLI interface
+│   │   │   ├── doc_loader.py     # Document loading (PDF, MD)
+│   │   │   ├── indexer_service.py# Vector indexing to Qdrant
+│   │   │   ├── ingest_service.py # Ingestion orchestration
+│   │   │   └── splitter.py       # Text chunking and splitting
+│   │   ├── pipeline/             # RAG pipeline components
+│   │   │   ├── context_builder.py# Context assembly for prompts
+│   │   │   ├── generation_service.py# LLM response generation
+│   │   │   └── retriever_service.py# Vector similarity search
+│   │   ├── exceptions.py         # RAG-specific exceptions
+│   │   └── queries.py            # Query builders and filters
 │   ├── infra/                    # External service clients
+│   │   ├── embedding_interface.py# Embedding provider interface
 │   │   ├── embeddings.py         # OpenAI embeddings via LiteLLM
 │   │   ├── llm_client.py         # LLM API client (ChatOpenAI)
 │   │   └── qdrant_repository.py  # Vector database operations
 │   ├── prompts/                  # LLM prompt templates
-│   └── tests/                    # Unit tests
+│   └── tests/                    # Unit and integration tests
+│       ├── rag/
+│            ├── ingestion/        # Tests for ingestion components
+│            └── pipeline/         # Tests for pipeline components
+│
 ├── policies/                      # Policy documents (ingested data)
 │   ├── AmericanAirlines/         # AA policies (4 markdown files)
 │   ├── Delta/                    # Delta policies (6 markdown files)
 │   └── United/                   # United policies (4 PDF files)
-├── qdrant_storage/               # Vector database storage (auto-generated)
 ├── docker-compose.yml            # Service orchestration definition
 ├── Dockerfile                    # Application container image
 ├── frontend.html                 # Static web interface
