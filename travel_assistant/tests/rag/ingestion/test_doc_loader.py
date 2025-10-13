@@ -7,7 +7,7 @@ from travel_assistant.rag.ingestion.doc_loader import (
     extract_text_from_pdf,
     load_document,
 )
-from travel_assistant.rag.ingestion.errors import ExtractionError
+from travel_assistant.rag.pipeline.errors import ExtractionError
 
 
 class TestDocLoader:

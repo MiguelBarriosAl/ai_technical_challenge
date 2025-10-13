@@ -1,8 +1,3 @@
-"""
-FastAPI routes for Travel Assistant API.
-Simple and direct route definitions.
-"""
-
 import logging
 from fastapi import APIRouter, HTTPException
 from travel_assistant.rag.queries import MetadataQuery
