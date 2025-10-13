@@ -1,6 +1,6 @@
 from langchain_openai import OpenAIEmbeddings
 from travel_assistant.core.settings import settings
-from travel_assistant.core.errors import IndexingError
+from travel_assistant.rag.ingestion.errors import IndexingError
 from travel_assistant.infra.embedding_interface import EmbeddingProvider
 
 

@@ -1,6 +1,6 @@
 import fitz
 import os
-from travel_assistant.rag.exceptions import ExtractionError
+from travel_assistant.rag.pipeline.errors import ExtractionError
 
 
 def extract_text_from_md(file_path: str) -> str:

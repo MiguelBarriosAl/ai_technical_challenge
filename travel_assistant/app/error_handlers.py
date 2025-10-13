@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 import logging
-from travel_assistant.core.errors import IndexingError
+from travel_assistant.rag.ingestion.errors import IndexingError
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,66 @@
 # Travel Assistant - RAG System
 
-RAG (Retrieval-Augmented Generation) system that answers questions about airline policies using vector search and LLM.
+Travel Assistant is a modular Retrieval-Augmented Generation (RAG) system designed to answer questions about airline policies using vector search and Large Language Models (LLMs).
+
+The project demonstrates a clean and production-oriented architecture with clear separation of concerns across ingestion, retrieval, and generation workflows.
+
+# Core Components Overview
+
+## Infrastructure Layer (infra/)
+
+Contains integrations with external services and APIs:
+
+- QdrantRepository – Handles vector storage and retrieval.
+
+- EmbeddingsProvider – Wrapper around OpenAI (via LiteLLM) for text embeddings.
+
+- EmbeddingFactory / Interface – Ensures clean creation, validation, and abstraction of embedding providers.
+
+## Ingestion Workflow (rag/ingestion/)
+
+Processes and indexes airline policy documents:
+
+- Doc Loader – Extracts text from PDFs and Markdown (with error handling for image-based PDFs).
+
+- Splitter – Chunks documents into overlapping text segments (optimized for 800–1000 characters).
+
+- Indexer Service – Generates embeddings, validates vector dimensions, and stores them in Qdrant.
+
+- CLI Runner – Executes the ingestion pipeline for multiple airlines.
+
+### RAG Pipeline (rag/pipeline/)
+
+Handles the question-answering process:
+
+- RetrieverService – Fetches relevant chunks from Qdrant using metadata filters.
+
+- ContextBuilder – Combines and cleans retrieved fragments into a coherent context block.
+
+- RAGGenerationService – Builds a prompt and generates a grounded answer using the LLM.
+
+### Application Layer (app/)
+
+Exposes a simple FastAPI endpoint:
+
+- /ask route orchestrates the full RAG workflow:
+  - `retrieve → build context → generate answer`
+  - returning both the answer and the supporting context.
+
+### Prompts (prompts/)
+
+Structured prompt templates specialized for different policy types (general, baggage, children travel), ensuring consistent and context-aware responses.
+
+### Key Design Principles
+
+Clean architecture with separated layers for ingestion, retrieval, and generation.
+
+Dependency injection for embeddings and vector storage.
+
+Error isolation and detailed logging for traceability.
+
+Reproducible environment via Poetry and Docker Compose (includes Qdrant).
+
+Comprehensive testing with more than 60 unit and integration tests using Pytest.
 
 ## Quick Start
 
@@ -69,52 +129,85 @@ make logs     # Show logs
 ## Project Structure
 
 ```
-ai_technical_challenge/
-├── travel_assistant/              # Python application
-│   ├── app/                      # FastAPI backend (routes, models, handlers)
-│   │   ├── models/               # Pydantic request/response models
-│   │   ├── main.py               # FastAPI application entry point
-│   │   ├── routes.py             # API endpoint definitions
-│   │   └── error_handlers.py     # Global exception handlers
-│   ├── core/                     # Central configuration
-│   │   ├── settings.py           # Environment variables & config
-│   │   ├── constants.py          # Application constants
-│   │   └── errors.py             # Custom exception classes
-│   ├── rag/                      # RAG system components
-│   │   ├── ingestion/            # Document processing and indexing
-│   │   │   ├── cli.py            # Ingestion CLI interface
-│   │   │   ├── doc_loader.py     # Document loading (PDF, MD)
-│   │   │   ├── indexer_service.py# Vector indexing to Qdrant
-│   │   │   ├── ingest_service.py # Ingestion orchestration
-│   │   │   └── splitter.py       # Text chunking and splitting
-│   │   ├── pipeline/             # RAG pipeline components
-│   │   │   ├── context_builder.py# Context assembly for prompts
-│   │   │   ├── generation_service.py# LLM response generation
-│   │   │   └── retriever_service.py# Vector similarity search
-│   │   ├── exceptions.py         # RAG-specific exceptions
-│   │   └── queries.py            # Query builders and filters
-│   ├── infra/                    # External service clients
-│   │   ├── embedding_interface.py# Embedding provider interface
-│   │   ├── embeddings.py         # OpenAI embeddings via LiteLLM
-│   │   ├── llm_client.py         # LLM API client (ChatOpenAI)
-│   │   └── qdrant_repository.py  # Vector database operations
-│   ├── prompts/                  # LLM prompt templates
-│   └── tests/                    # Unit and integration tests
-│       ├── rag/
-│            ├── ingestion/        # Tests for ingestion components
-│            └── pipeline/         # Tests for pipeline components
-│
-├── policies/                      # Policy documents (ingested data)
-│   ├── AmericanAirlines/         # AA policies (4 markdown files)
-│   ├── Delta/                    # Delta policies (6 markdown files)
-│   └── United/                   # United policies (4 PDF files)
+.
 ├── docker-compose.yml            # Service orchestration definition
 ├── Dockerfile                    # Application container image
-├── frontend.html                 # Static web interface
-├── nginx.conf                    # Frontend server configuration
+├── front/                        # Frontend files
+│   └── frontend.html             # Static web interface
 ├── Makefile                      # Build automation & CI/CD pipeline
-├── .env.docker                   # Docker environment variables
-└── pyproject.toml               # Python dependencies (Poetry)
+├── nginx.conf                    # Frontend server configuration
+├── poetry.lock                   # Locked dependency versions
+├── policies/                     # Policy documents (ingested data)
+│   ├── AmericanAirlines/
+│   │   ├── Checked bag policy.md
+│   │   ├── Pet Policy.md
+│   │   ├── Policy.md
+│   │   └── Traveling with children.md
+│   ├── Delta/
+│   │   ├── Baggage & Travel Fees.md
+│   │   ├── Children Infant Travel.md
+│   │   ├── Frequently Asked Questions.md
+│   │   ├── Infant Air Travel.md
+│   │   ├── Pets.md
+│   │   └── Special Circumstances.md
+│   └── United/
+│       ├── Checked bags.pdf
+│       ├── Flying while Pregnant.pdf
+│       ├── Flying with Kids & Family Boarding.pdf
+│       └── Traveling with pets.pdf
+├── pyproject.toml               # Python dependencies & project config (Poetry)
+├── README_challenge.md          # Original challenge requirements
+├── README.md                    # Project documentation (this file)
+└── travel_assistant/            # Python application
+    ├── app/                     # FastAPI backend
+    │   ├── error_handlers.py    # Global exception handlers
+    │   ├── __init__.py
+    │   ├── main.py              # FastAPI application entry point
+    │   ├── models/              # Pydantic request/response models
+    │   │   ├── ask_models.py    # Request and response data models
+    │   │   └── __init__.py
+    │   └── routes.py            # API endpoint definitions
+    ├── core/                    # Central configuration
+    │   ├── constants.py         # Application constants
+    │   ├── __init__.py
+    │   └── settings.py          # Environment variables & config
+    ├── infra/                   # External service clients
+    │   ├── embedding_interface.py # Embedding provider interface
+    │   ├── embeddings.py        # OpenAI embeddings via LiteLLM
+    │   ├── llm_client.py        # LLM API client (ChatOpenAI)
+    │   └── qdrant_repository.py # Vector database operations
+    ├── __init__.py
+    ├── prompts/                 # LLM prompt templates
+    │   └── airline_prompts.py   # Airline-specific prompt templates
+    ├── rag/                     # RAG system components
+    │   ├── ingestion/           # Document processing and indexing
+    │   │   ├── cli.py           # Ingestion CLI interface
+    │   │   ├── doc_loader.py    # Document loading (PDF, MD)
+    │   │   ├── errors.py        # Ingestion-specific exceptions
+    │   │   ├── indexer_service.py # Vector indexing to Qdrant
+    │   │   ├── ingest_service.py # Ingestion orchestration
+    │   │   ├── __init__.py
+    │   │   └── splitter.py      # Text chunking and splitting
+    │   ├── __init__.py
+    │   ├── pipeline/            # RAG pipeline components
+    │   │   ├── context_builder.py # Context assembly for prompts
+    │   │   ├── errors.py        # Pipeline-specific exceptions
+    │   │   ├── generation_service.py # LLM response generation
+    │   │   ├── __init__.py
+    │   │   └── retriever_service.py # Vector similarity search
+    │   └── queries.py           # Query builders and filters
+    └── tests/                   # Unit and integration tests
+        ├── conftest.py          # Pytest configuration and fixtures
+        └── rag/                 # RAG system tests
+            ├── ingestion/       # Tests for ingestion components
+            │   ├── __init__.py
+            │   ├── test_doc_loader.py     # Document loader tests
+            │   ├── test_indexer_service.py # Vector indexing tests
+            │   ├── test_ingest_service.py  # Ingestion orchestration tests
+            │   └── test_splitter.py       # Text chunking tests
+            └── pipeline/        # Tests for pipeline components
+                ├── __init__.py
+                └── test_retriever_service.py # Vector retrieval tests
 ```
 
 ## Technical Components
@@ -154,3 +247,12 @@ The project includes automated checks for:
 - **Docker** + **Docker Compose** (containerization)
 - **Nginx** (frontend web server)
 - **Ruff** + **Black** (code quality)
+
+## Possible Next Improvements
+
+- Advanced Retriever
+Integrate hybrid retrieval strategies (vector + keyword filters) or semantic re-ranking (e.g., sentence-transformers) to improve contextual precision and relevance across multiple airlines or policy domains.
+
+- Light Conversational Memory
+Add short-term conversational memory to handle follow-up questions (e.g., “What about baggage for children?”).
+This can be implemented via an in-memory buffer or Redis cache, appending recent Q&A context before each LLM call.

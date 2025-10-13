@@ -21,6 +21,7 @@ def main():
     embeddings_provider = EmbeddingsProvider(model_name=settings.EMBEDDING_MODEL)
     indexer = IndexerService(qdrant_repo, embeddings_provider)
 
+    # TODO: Map airline names to their respective policies
     for airline in ["Delta", "AmericanAirlines", "United"]:
         run_ingestion(
             base_path="policies",

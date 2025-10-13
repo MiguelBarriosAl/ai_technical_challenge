@@ -1,11 +1,7 @@
-"""Unit tests for ingestion service."""
-
 import tempfile
+import pytest
 from pathlib import Path
 from unittest.mock import patch
-
-import pytest
-
 from travel_assistant.rag.ingestion.ingest_service import run_ingestion
 
 
