@@ -132,7 +132,8 @@ make logs     # Show logs
 .
 ├── docker-compose.yml            # Service orchestration definition
 ├── Dockerfile                    # Application container image
-├── frontend.html                 # Static web interface
+├── front/                        # Frontend files
+│   └── frontend.html             # Static web interface
 ├── Makefile                      # Build automation & CI/CD pipeline
 ├── nginx.conf                    # Frontend server configuration
 ├── poetry.lock                   # Locked dependency versions

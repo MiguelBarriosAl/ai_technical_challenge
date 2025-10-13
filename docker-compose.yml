@@ -48,6 +48,6 @@ services:
     depends_on:
       - api
     volumes:
-      - ./frontend.html:/usr/share/nginx/html/index.html:ro
+      - ./front/frontend.html:/usr/share/nginx/html/index.html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
