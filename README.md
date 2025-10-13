@@ -247,3 +247,12 @@ The project includes automated checks for:
 - **Docker** + **Docker Compose** (containerization)
 - **Nginx** (frontend web server)
 - **Ruff** + **Black** (code quality)
+
+## Possible Next Improvements
+
+- Advanced Retriever
+Integrate hybrid retrieval strategies (vector + keyword filters) or semantic re-ranking (e.g., sentence-transformers) to improve contextual precision and relevance across multiple airlines or policy domains.
+
+- Light Conversational Memory
+Add short-term conversational memory to handle follow-up questions (e.g., “What about baggage for children?”).
+This can be implemented via an in-memory buffer or Redis cache, appending recent Q&A context before each LLM call.
