@@ -1,4 +1,4 @@
-class IndexingError(Exception):
-    """Raised when document indexing fails."""
+# class IndexingError(Exception):
+#     """Raised when document indexing fails."""
 
-    pass
+#     pass

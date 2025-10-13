@@ -1,11 +1,7 @@
-"""Unit tests for IndexerService class."""
-
+import pytest
 import hashlib
 from unittest.mock import patch
-
-import pytest
-
-from travel_assistant.core.errors import IndexingError
+from travel_assistant.rag.ingestion.errors import IndexingError
 from travel_assistant.rag.ingestion.indexer_service import IndexerService
 
 

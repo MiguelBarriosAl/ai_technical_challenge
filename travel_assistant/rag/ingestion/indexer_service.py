@@ -2,7 +2,7 @@ import hashlib
 import logging
 from typing import List, Dict
 from qdrant_client.models import PointStruct
-from travel_assistant.core.errors import IndexingError
+from travel_assistant.rag.ingestion.errors import IndexingError
 from travel_assistant.core.settings import settings
 
 
