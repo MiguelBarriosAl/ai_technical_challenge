@@ -5,7 +5,7 @@ import tempfile
 import fitz
 import pytest
 from unittest.mock import Mock
-from travel_assistant.rag.indexer_service import IndexerService
+from travel_assistant.rag.ingestion.indexer_service import IndexerService
 
 
 @pytest.fixture

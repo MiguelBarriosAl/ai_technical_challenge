@@ -1,6 +1,7 @@
 from langchain_openai import OpenAIEmbeddings
 from travel_assistant.core.settings import settings
 from travel_assistant.core.errors import IndexingError
+from travel_assistant.infra.embedding_interface import EmbeddingProvider
 
 
 class EmbeddingFactory:
@@ -64,8 +65,8 @@ class EmbeddingFactory:
             raise IndexingError(f"Failed to get embedding dimension: {e}") from e
 
 
-class EmbeddingsProvider:
-    """Unified interface over the selected embedding backend."""
+class EmbeddingsProvider(EmbeddingProvider):
+    """Concrete implementation of embedding provider using OpenAI."""
 
     def __init__(self, model_name: str):
         self.model = EmbeddingFactory.create(model_name)

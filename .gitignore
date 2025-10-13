@@ -16,3 +16,8 @@ env/
 .idea/
 # Ignore qdrant database files
 qdrant_storage
+
+# Ignore logs
+*.log
+server.log
+fastapi.log

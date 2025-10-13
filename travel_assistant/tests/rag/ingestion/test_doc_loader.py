@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import Mock, patch
-from travel_assistant.rag.doc_loader import (
+from travel_assistant.rag.ingestion.doc_loader import (
     extract_text_from_md,
     extract_text_from_pdf,
     load_document,
@@ -57,7 +57,7 @@ class TestDocLoader:
             extract_text_from_pdf(pdf_path)
         assert "Failed to extract text from PDF file" in str(exc_info.value)
 
-    @patch("travel_assistant.rag.doc_loader.fitz.open")
+    @patch("travel_assistant.rag.ingestion.doc_loader.fitz.open")
     def test_extract_text_from_pdf_fitz_error(self, mock_fitz_open, temp_pdf_file):
         """Test PDF extraction with fitz library error."""
         file_path, _ = temp_pdf_file
@@ -71,7 +71,7 @@ class TestDocLoader:
         """Test that PDF document is properly closed after extraction."""
         file_path, _ = temp_pdf_file
 
-        with patch("travel_assistant.rag.doc_loader.fitz.open") as mock_fitz_open:
+        with patch("travel_assistant.rag.ingestion.doc_loader.fitz.open") as mock_fitz_open:
             mock_doc = Mock()
             mock_page = Mock()
             mock_page.get_text.return_value = "Test content"
@@ -94,8 +94,8 @@ class TestDocLoader:
         """Test load_document dispatches to correct extraction function."""
         test_file = f"/tmp/test{file_extension}"
 
-        with patch("travel_assistant.rag.doc_loader.os.path.isfile", return_value=True):
-            patch_path = f"travel_assistant.rag.doc_loader.{expected_function}"
+        with patch("travel_assistant.rag.ingestion.doc_loader.os.path.isfile", return_value=True):
+            patch_path = f"travel_assistant.rag.ingestion.doc_loader.{expected_function}"
             with patch(patch_path) as mock_func:
                 mock_func.return_value = "test content"
 
@@ -133,15 +133,16 @@ class TestDocLoader:
         test_file = f"/tmp/test{extension}"
         expected_lower = extension.lower()
 
-        with patch("travel_assistant.rag.doc_loader.os.path.isfile", return_value=True):
+        patch_isfile = "travel_assistant.rag.ingestion.doc_loader.os.path.isfile"
+        with patch(patch_isfile, return_value=True):
             if expected_lower == ".md":
-                patch_path = "travel_assistant.rag.doc_loader.extract_text_from_md"
+                patch_path = "travel_assistant.rag.ingestion.doc_loader.extract_text_from_md"
                 with patch(patch_path) as mock_func:
                     mock_func.return_value = "content"
                     load_document(test_file)
                     mock_func.assert_called_once_with(test_file)
             elif expected_lower == ".pdf":
-                patch_path = "travel_assistant.rag.doc_loader.extract_text_from_pdf"
+                patch_path = "travel_assistant.rag.ingestion.doc_loader.extract_text_from_pdf"
                 with patch(patch_path) as mock_func:
                     mock_func.return_value = "content"
                     load_document(test_file)
@@ -175,7 +176,7 @@ class TestDocLoader:
         """Test original exceptions are properly chained in PDF."""
         file_path, _ = temp_pdf_file
 
-        mock_path = "travel_assistant.rag.doc_loader.fitz.open"
+        mock_path = "travel_assistant.rag.ingestion.doc_loader.fitz.open"
         with patch(mock_path, side_effect=IOError("Original error")):
             try:
                 extract_text_from_pdf(file_path)

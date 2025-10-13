@@ -19,8 +19,9 @@ COPY policies ./policies
 
 RUN poetry install --no-interaction --no-ansi
 
-EXPOSE 8501
+EXPOSE 8080
 
 ENV PYTHONPATH="/app"
 
-CMD ["streamlit", "run", "travel_assistant/app/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Default command for FastAPI (can be overridden in docker-compose)
+CMD ["uvicorn", "travel_assistant.app.main:app", "--host", "0.0.0.0", "--port", "8080"]

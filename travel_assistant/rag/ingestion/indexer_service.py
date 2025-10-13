@@ -52,6 +52,7 @@ class IndexerService:
                 id_string = f"{chunk['doc_id']}:{chunk['policy_version']}:{chunk['chunk_id']}"
                 point_id = hashlib.md5(id_string.encode()).hexdigest()
                 payload = {
+                    "text": chunk["text"],
                     "airline": chunk["airline"],
                     "locale": chunk["locale"],
                     "policy_version": chunk["policy_version"],

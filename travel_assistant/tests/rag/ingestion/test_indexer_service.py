@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from travel_assistant.core.errors import IndexingError
-from travel_assistant.rag.indexer_service import IndexerService
+from travel_assistant.rag.ingestion.indexer_service import IndexerService
 
 
 class TestIndexerService:
@@ -188,14 +188,14 @@ class TestIndexerService:
 
         assert "empty vector output" in str(exc_info.value)
 
-    @patch("travel_assistant.rag.indexer_service.logger")
+    @patch("travel_assistant.rag.ingestion.indexer_service.logger")
     def test_index_chunks_logging_success(self, mock_logger, indexer_service, sample_chunks):
         """Test that successful indexing is logged."""
         indexer_service.index_chunks(sample_chunks)
 
         mock_logger.info.assert_called_once_with("Indexed 3 chunks successfully.")
 
-    @patch("travel_assistant.rag.indexer_service.logger")
+    @patch("travel_assistant.rag.ingestion.indexer_service.logger")
     def test_index_chunks_logging_failure(
         self, mock_logger, indexer_service, mock_embeddings_provider, sample_chunks
     ):

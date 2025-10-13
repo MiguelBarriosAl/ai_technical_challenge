@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import patch
 
-from travel_assistant.rag.splitter import split_text
+from travel_assistant.rag.ingestion.splitter import split_text
 
 
 class TestSplitter:
@@ -12,8 +12,8 @@ class TestSplitter:
     def test_split_text_normal_operation(self):
         """Test normal text splitting with chunks and overlap."""
         # Use constants to make the test predictable
-        with patch("travel_assistant.rag.splitter.CHUNK_SIZE", 50):
-            with patch("travel_assistant.rag.splitter.CHUNK_OVERLAP", 10):
+        with patch("travel_assistant.rag.ingestion.splitter.CHUNK_SIZE", 50):
+            with patch("travel_assistant.rag.ingestion.splitter.CHUNK_OVERLAP", 10):
                 text = "This is a sample text that should be split into multiple chunks for testing purposes."
 
                 result = split_text(
@@ -78,8 +78,8 @@ class TestSplitter:
 
     def test_split_text_overlap_behavior(self):
         """Test that overlapping works correctly."""
-        with patch("travel_assistant.rag.splitter.CHUNK_SIZE", 20):
-            with patch("travel_assistant.rag.splitter.CHUNK_OVERLAP", 5):
+        with patch("travel_assistant.rag.ingestion.splitter.CHUNK_SIZE", 20):
+            with patch("travel_assistant.rag.ingestion.splitter.CHUNK_OVERLAP", 5):
                 text = "123456789012345678901234567890"  # 30 chars
 
                 result = split_text(

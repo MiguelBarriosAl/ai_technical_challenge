@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Assistant - RAG + LLM Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .example-queries {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .example-queries h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .query-button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+        }
+        .query-button:hover {
+            background: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            background: #218838;
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        .response.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .response.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+            display: none;
+        }
+        .answer-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .context-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛫 Travel Assistant - RAG + LLM Demo</h1>
+
+        <div class="example-queries">
+            <h3>📋 Example Queries from Technical Challenge</h3>
+            <button class="query-button" onclick="loadExampleQuery(1)">
+                1. Can my pet travel with me on the plane on Delta?
+            </button>
+            <button class="query-button" onclick="loadExampleQuery(2)">
+                2. I have three kids 2, 8 and 10 years old and I am traveling with them on a United flight, what are the rules for children traveling?
+            </button>
+            <button class="query-button" onclick="loadExampleQuery(3)">
+                3. What is the baggage policy for American Airlines?
+            </button>
+            <button class="query-button" onclick="loadExampleQuery(4)">
+                4. My wife is 8 months pregnant, can she travel on a Delta flight?
+            </button>
+        </div>
+
+        <form id="queryForm">
+            <div class="form-group">
+                <label for="question">Question:</label>
+                <textarea id="question" name="question" placeholder="Enter your airline policy question here..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="airline">Airline:</label>
+                <select id="airline" name="airline" required>
+                    <option value="">Select Airline</option>
+                    <option value="Delta">Delta</option>
+                    <option value="United">United</option>
+                    <option value="AmericanAirlines">American Airlines</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="locale">Locale:</label>
+                <select id="locale" name="locale" required>
+                    <option value="en-US">English (US)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🚀 Ask RAG + LLM System
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            ⏳ Processing your question with RAG + LLM system...
+        </div>
+
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        const examples = {
+            1: {
+                question: "Can my pet travel with me on the plane on Delta?",
+                airline: "Delta"
+            },
+            2: {
+                question: "I have three kids 2, 8 and 10 years old and I am traveling with them on a United flight, what are the rules for children traveling?",
+                airline: "United"
+            },
+            3: {
+                question: "What is the baggage policy for American Airlines?",
+                airline: "AmericanAirlines"
+            },
+            4: {
+                question: "My wife is 8 months pregnant, can she travel on a Delta flight?",
+                airline: "Delta"
+            }
+        };
+
+        function loadExampleQuery(num) {
+            const example = examples[num];
+            document.getElementById('question').value = example.question;
+            document.getElementById('airline').value = example.airline;
+            document.getElementById('locale').value = 'en-US';
+        }
+
+        document.getElementById('queryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const response = document.getElementById('response');
+
+            // Show loading state
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            response.style.display = 'none';
+
+            const formData = {
+                question: document.getElementById('question').value,
+                airline: document.getElementById('airline').value,
+                locale: document.getElementById('locale').value
+            };
+
+            try {
+                const apiResponse = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await apiResponse.json();
+
+                if (apiResponse.ok) {
+                    response.className = 'response success';
+                    response.innerHTML = `
+                        <h3>✅ RAG + LLM Response</h3>
+                        <p><strong>Question:</strong> ${result.question}</p>
+                        <div class="answer-box">
+                            <strong>Answer:</strong><br>
+                            ${result.answer}
+                        </div>
+                        <div class="context-box">
+                            <strong>Retrieved Context:</strong><br>
+                            ${result.context || 'No context retrieved'}
+                        </div>
+                    `;
+                } else {
+                    response.className = 'response error';
+                    response.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p>Status: ${apiResponse.status}</p>
+                        <p>Message: ${result.detail || 'Unknown error'}</p>
+                    `;
+                }
+            } catch (error) {
+                response.className = 'response error';
+                response.innerHTML = `
+                    <h3>❌ Connection Error</h3>
+                    <p>Could not connect to the API server.</p>
+                    <p>Make sure the services are running correctly. Check docker logs if needed.</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+                response.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
