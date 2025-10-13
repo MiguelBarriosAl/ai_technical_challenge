@@ -1,11 +1,6 @@
-"""
-Handles semantic retrieval from Qdrant using embedding similarity and flexible query filters.
-"""
-
 import logging
 from typing import List
 from urllib.parse import urlparse
-
 from travel_assistant.infra.qdrant_repository import QdrantRepository
 from travel_assistant.rag.queries import BaseQuery
 from travel_assistant.infra.embedding_interface import EmbeddingProvider

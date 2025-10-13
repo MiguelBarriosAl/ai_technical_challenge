@@ -1,4 +1,4 @@
-class ExtractionError(Exception):
-    """Custom exception for errors during data extraction."""
+# class ExtractionError(Exception):
+#     """Custom exception for errors during data extraction."""
 
-    pass
+#     pass
