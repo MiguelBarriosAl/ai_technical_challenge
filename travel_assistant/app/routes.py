@@ -3,7 +3,9 @@ from fastapi import APIRouter, HTTPException
 from travel_assistant.rag.queries import MetadataQuery
 from travel_assistant.rag.pipeline.context_builder import ContextBuilder
 from travel_assistant.rag.pipeline.retriever_service import RetrieverService
-from travel_assistant.rag.pipeline.generation_service import RAGGenerationService
+from travel_assistant.rag.pipeline.generation_service import (
+    RAGGenerationService,
+)
 from travel_assistant.infra.embeddings import EmbeddingsProvider
 from travel_assistant.core.settings import settings
 from travel_assistant.app.models.ask_models import AskRequest
@@ -16,7 +18,9 @@ router = APIRouter()
 # Initialize services with dependency injection
 embedding_provider = EmbeddingsProvider(model_name=settings.EMBEDDING_MODEL)
 retriever = RetrieverService(
-    collection_name="airline_policies", embedding_provider=embedding_provider, k=5
+    collection_name="airline_policies",
+    embedding_provider=embedding_provider,
+    k=5,
 )
 context_builder = ContextBuilder(max_length=3000)
 generation_service = RAGGenerationService()
@@ -34,16 +38,24 @@ async def ask(req: AskRequest):
     Ask a question about airline policies using RAG.
 
     Args:
-        req: Request containing question, airline, locale, and optional policy_version
+        req: Request containing question, airline, locale, and optional
+            policy_version
 
     Returns:
         Response with question, context, and generated answer
     """
     try:
-        logger.info("Processing question for airline=%s, locale=%s", req.airline, req.locale)
+        logger.info(
+            "Processing question for airline=%s, locale=%s, session_id=%s",
+            req.airline,
+            req.locale,
+            req.session_id or "<none>",
+        )
 
         query = MetadataQuery(
-            airline=req.airline, locale=req.locale, policy_version=req.policy_version
+            airline=req.airline,
+            locale=req.locale,
+            policy_version=req.policy_version,
         )
 
         # Step 1: Retrieve fragments from Qdrant
@@ -58,7 +70,12 @@ async def ask(req: AskRequest):
         answer = generation_service.generate_answer(req.question, context)
         logger.info("Generated answer with length: %d", len(answer))
 
-        return {"question": req.question, "context": context, "answer": answer}
+        return {
+            "question": req.question,
+            "context": context,
+            "answer": answer,
+            "session_id": req.session_id,
+        }
 
     except Exception as e:
         logger.exception("Error processing question: %s", str(e))
