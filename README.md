@@ -6,7 +6,7 @@ The project demonstrates a clean and production-oriented architecture with clear
 
 ## System Architecture Overview
 
-![Architecture Diagram](docs/images/architecture-diagram.png)
+![Architecture Diagram](docs/images/diagram.png)
 
 # Core Components Overview
 
