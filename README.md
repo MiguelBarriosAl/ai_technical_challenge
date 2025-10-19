@@ -4,6 +4,10 @@ Travel Assistant is a modular Retrieval-Augmented Generation (RAG) system design
 
 The project demonstrates a clean and production-oriented architecture with clear separation of concerns across ingestion, retrieval, and generation workflows.
 
+## System Architecture Overview
+
+![Architecture Diagram](docs/images/architecture-diagram.png)
+
 # Core Components Overview
 
 ## Infrastructure Layer (infra/)
