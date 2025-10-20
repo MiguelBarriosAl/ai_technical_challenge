@@ -9,6 +9,7 @@ from travel_assistant.rag.pipeline.generation_service import (
 from travel_assistant.infra.embeddings import EmbeddingsProvider
 from travel_assistant.core.settings import settings
 from travel_assistant.app.models.ask_models import AskRequest
+from langchain.memory import ConversationBufferWindowMemory
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,9 @@ retriever = RetrieverService(
 )
 context_builder = ContextBuilder(max_length=3000)
 generation_service = RAGGenerationService()
+
+# Una instancia compartida para todas las sesiones
+conversation_memory = ConversationBufferWindowMemory(k=5)
 
 
 @router.get("/health")
@@ -45,30 +49,38 @@ async def ask(req: AskRequest):
         Response with question, context, and generated answer
     """
     try:
-        logger.info(
-            "Processing question for airline=%s, locale=%s, session_id=%s",
-            req.airline,
-            req.locale,
-            req.session_id or "<none>",
-        )
+        # Load history from memory (if session_id provided)
+        history = conversation_memory.chat_memory.messages
+        history_str = "\n".join([f"{m.type}: {m.content}" for m in history])
+        logger.debug("Loaded history for session %s", req.session_id)
 
+        # Build query
         query = MetadataQuery(
             airline=req.airline,
             locale=req.locale,
             policy_version=req.policy_version,
         )
 
-        # Step 1: Retrieve fragments from Qdrant
+        # Retrieve fragments
         fragments = retriever.retrieve(req.question, query)
         logger.info("Retrieved %d fragments", len(fragments))
 
-        # Step 2: Build context
+        # Prepend history to context (if exists)
+        if history_str:
+            fragments = [history_str] + fragments
+            logger.info("Prepended history to fragments for session %s", req.session_id)
+
+        # Build context
         context = context_builder.build(fragments)
         logger.info("Built context with length: %d", len(context))
 
-        # Step 3: Generate answer using RAG
+        # Generate answer
         answer = generation_service.generate_answer(req.question, context)
         logger.info("Generated answer with length: %d", len(answer))
+
+        # Save to memory (if session_id exists)
+        conversation_memory.save_context(inputs={"input": req.question}, outputs={"output": answer})
+        logger.info("Saved turn to memory for session %s", req.session_id)
 
         return {
             "question": req.question,
