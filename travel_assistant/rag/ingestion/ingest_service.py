@@ -28,6 +28,7 @@ def run_ingestion(
         return
 
     all_chunks = []
+    # TODO: Consider parallel processing for large document sets
     for f in airline_path.glob("*"):
         ext = f.suffix.lower()
         if ext not in SUPPORTED_FILE_FORMATS:
