@@ -1,3 +1,9 @@
-from .conversation_memory import ConversationTurn, ConversationMemory
+"""Conversation memory module.
 
-__all__ = ["ConversationTurn", "ConversationMemory"]
+Provides in-memory storage for conversation history with sliding window
+strategy.
+"""
+
+from langchain.memory import ConversationBufferWindowMemory
+
+__all__ = ["ConversationBufferWindowMemory"]
