@@ -20,21 +20,22 @@ class RAGGenerationService:
         """
         self.llm_client = llm_client or OpenAILLMClient()  # Default to OpenAI client
 
-    def generate_answer(self, question: str, context: str) -> str:
+    def generate_answer(self, question: str, context: str, history: str = "") -> str:
         """
-        Generate an answer using RAG approach.
+        Generate an answer using RAG approach with optional history.
 
         Args:
-            question: User's question
-            context: Retrieved context from RAG retrieval
+            question: User's question.
+            context: Retrieved context from RAG retrieval.
+            history: Optional conversation history from memory buffer.
 
         Returns:
-            Generated answer from LLM
+            Generated answer from LLM.
         """
         logger.info("Generating RAG answer for question length: %d", len(question))
 
-        # Build prompt using our simplified prompt template
-        prompt = build_rag_prompt(question, context)
+        # Build prompt using our prompt template with history
+        prompt = build_rag_prompt(question, context, history=history)
 
         # Generate response using LLM client
         try:

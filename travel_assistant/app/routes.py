@@ -77,8 +77,8 @@ async def ask(req: AskRequest):
         context = context_builder.build(fragments)
         logger.info("Built context with length: %d", len(context))
 
-        # Generate answer
-        answer = generation_service.generate_answer(req.question, context)
+        # Generate answer with conversation history
+        answer = generation_service.generate_answer(req.question, context, history=history_str)
         logger.info("Generated answer with length: %d", len(answer))
 
         # Save to conversation memory
