@@ -12,7 +12,17 @@ SCORE_THRESHOLD: Annotated[float, "Minimum similarity score threshold"] = 0.2
 VECTOR_SIZE: Annotated[int, "Size of the embedding vectors"] = (
     1536  # OpenAI's text-embedding-ada-002 vector size
 )
+
 # Ingestion Configuration
-SUPPORTED_FILE_FORMATS: Annotated[set[str], "Allowed document extensions"] = {".md", ".pdf"}
+SUPPORTED_FILE_FORMATS: Annotated[set[str], "Allowed document extensions"] = {
+    ".md",
+    ".pdf",
+}
+
+# Context Building Configuration
+CONTEXT_MAX_LENGTH: Annotated[int, "Maximum context string length"] = 3000
 
 # LLM Configuration
+
+# Conversational Memory Configuration
+CONVERSATION_BUFFER_WINDOW_K: Annotated[int, "Conversation memory window size (last K turns)"] = 5

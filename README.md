@@ -42,6 +42,8 @@ Handles the question-answering process:
 
 - RAGGenerationService – Builds a prompt and generates a grounded answer using the LLM.
 
+- ConversationBufferWindowMemory – Maintains conversation history (last k=5 turns) to enable contextual follow-up questions.
+
 ### Application Layer (app/)
 
 Exposes a simple FastAPI endpoint:
@@ -65,6 +67,16 @@ Error isolation and detailed logging for traceability.
 Reproducible environment via Poetry and Docker Compose (includes Qdrant).
 
 Comprehensive testing with more than 60 unit and integration tests using Pytest.
+
+### Conversational Memory
+
+The system implements **ConversationBufferWindowMemory** (k=5) to maintain conversation context:
+
+- **Window Strategy:** Keeps last 5 messages (questions + answers) to balance context retention with token efficiency.
+- **Integration:** History is automatically prepended to RAG context, allowing the LLM to understand follow-up questions.
+- **Mechanism:** When a user asks "And what about carry-on?", the system recalls previous questions about baggage policy within the same conversation.
+
+This enables coherent multi-turn interactions without token overflow.
 
 ## Quick Start
 

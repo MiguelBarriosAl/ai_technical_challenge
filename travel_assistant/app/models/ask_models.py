@@ -11,3 +11,10 @@ class AskRequest(BaseModel):
     policy_version: Optional[str] = Field(
         None, description="Specific version of the airline policy"
     )
+    session_id: Optional[str] = Field(
+        None,
+        description=(
+            "Conversation session identifier. If provided, conversational "
+            "memoria (contexto previo) será vinculada."
+        ),
+    )

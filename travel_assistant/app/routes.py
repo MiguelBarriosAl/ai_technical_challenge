@@ -3,10 +3,18 @@ from fastapi import APIRouter, HTTPException
 from travel_assistant.rag.queries import MetadataQuery
 from travel_assistant.rag.pipeline.context_builder import ContextBuilder
 from travel_assistant.rag.pipeline.retriever_service import RetrieverService
-from travel_assistant.rag.pipeline.generation_service import RAGGenerationService
+from travel_assistant.rag.pipeline.generation_service import (
+    RAGGenerationService,
+)
 from travel_assistant.infra.embeddings import EmbeddingsProvider
 from travel_assistant.core.settings import settings
+from travel_assistant.core.constants import (
+    TOP_K,
+    CONTEXT_MAX_LENGTH,
+    CONVERSATION_BUFFER_WINDOW_K,
+)
 from travel_assistant.app.models.ask_models import AskRequest
+from langchain.memory import ConversationBufferWindowMemory
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +24,13 @@ router = APIRouter()
 # Initialize services with dependency injection
 embedding_provider = EmbeddingsProvider(model_name=settings.EMBEDDING_MODEL)
 retriever = RetrieverService(
-    collection_name="airline_policies", embedding_provider=embedding_provider, k=5
+    collection_name="airline_policies",
+    embedding_provider=embedding_provider,
+    k=TOP_K,
 )
-context_builder = ContextBuilder(max_length=3000)
+context_builder = ContextBuilder(max_length=CONTEXT_MAX_LENGTH)
 generation_service = RAGGenerationService()
+conversation_memory = ConversationBufferWindowMemory(k=CONVERSATION_BUFFER_WINDOW_K)
 
 
 @router.get("/health")
@@ -34,31 +45,54 @@ async def ask(req: AskRequest):
     Ask a question about airline policies using RAG.
 
     Args:
-        req: Request containing question, airline, locale, and optional policy_version
+        req: Request containing question, airline, locale, and optional
+            policy_version
 
     Returns:
         Response with question, context, and generated answer
     """
     try:
-        logger.info("Processing question for airline=%s, locale=%s", req.airline, req.locale)
+        # Load conversation history from memory
+        # Note: Future - session_id could enable multi-user sessions
+        history = conversation_memory.chat_memory.messages
+        history_str = "\n".join([f"{m.type}: {m.content}" for m in history])
 
+        # Build query
         query = MetadataQuery(
-            airline=req.airline, locale=req.locale, policy_version=req.policy_version
+            airline=req.airline,
+            locale=req.locale,
+            policy_version=req.policy_version,
         )
 
-        # Step 1: Retrieve fragments from Qdrant
+        # Retrieve fragments
         fragments = retriever.retrieve(req.question, query)
         logger.info("Retrieved %d fragments", len(fragments))
 
-        # Step 2: Build context
+        # Prepend history to context (if exists)
+        if history_str:
+            fragments = [history_str] + fragments
+            logger.info("Prepended conversation history to fragments")
+
+        # Build context
         context = context_builder.build(fragments)
         logger.info("Built context with length: %d", len(context))
 
-        # Step 3: Generate answer using RAG
-        answer = generation_service.generate_answer(req.question, context)
+        # Generate answer with conversation history
+        answer = generation_service.generate_answer(req.question, context, history=history_str)
         logger.info("Generated answer with length: %d", len(answer))
 
-        return {"question": req.question, "context": context, "answer": answer}
+        # Save to conversation memory
+        conversation_memory.save_context(
+            inputs={"input": req.question},
+            outputs={"output": answer},
+        )
+        logger.info("Saved turn to conversation memory")
+
+        return {
+            "question": req.question,
+            "context": context,
+            "answer": answer,
+        }
 
     except Exception as e:
         logger.exception("Error processing question: %s", str(e))
